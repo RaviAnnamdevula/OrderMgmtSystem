@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<hibernate-configuration>
+    <session-factory>
+        <!-- Database Connection Settings -->
+        <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/umd</property>
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password">Mysql@2003</property>
+
+        <!-- Hibernate Dialect for MySQL -->
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+
+        <!-- Show SQL Queries in Console -->
+        <property name="hibernate.show_sql">true</property>
+
+        <!-- Format SQL Queries -->
+        <property name="hibernate.format_sql">true</property>
+
+        <property name="hibernate.connection.autocommit">false</property>
+
+
+        <!-- Auto-Generate Table (update, create, create-drop, none) -->
+        <property name="hibernate.hbm2ddl.auto">update</property>
+
+        <!-- Mapping for Entity -->
+        <mapping class="com.jocata.oms.datamodel.um.entity.AddressEntity"/>
+        <mapping class="com.jocata.oms.datamodel.um.entity.PermissionEntity"/>
+        <mapping class="com.jocata.oms.datamodel.um.entity.RefreshTokenEntity"/>
+        <mapping class="com.jocata.oms.datamodel.um.entity.RoleEntity"/>
+        <mapping class="com.jocata.oms.datamodel.um.entity.UserEntity"/>
+    </session-factory>
+</hibernate-configuration>
