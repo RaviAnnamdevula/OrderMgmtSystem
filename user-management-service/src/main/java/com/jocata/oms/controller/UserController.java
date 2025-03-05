@@ -28,9 +28,15 @@ public class UserController {
         return ResponseEntity.ok(ResponseBuilder.buildResponse(user, "User created successfully", HttpStatus.OK));
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/id/{userId}")
     public GenericResponsePayload<UserEntity> getUserById(@PathVariable Integer userId) {
         UserEntity user = userService.getUserById(userId);
+        return buildResponse(user, "User fetched successfully");
+    }
+
+    @GetMapping("/email/{email}")
+    public GenericResponsePayload<UserEntity> getUserByEmail(@PathVariable String email) {
+        UserEntity user = userService.getUserByEmail(email);
         return buildResponse(user, "User fetched successfully");
     }
 

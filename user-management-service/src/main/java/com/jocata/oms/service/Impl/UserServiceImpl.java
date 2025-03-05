@@ -50,6 +50,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserEntity getUserByEmail(String email) {
+        UserEntity user = userDao.getUserByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException("User with Email: " + email + " not found");
+        }
+        // Explicitly fetch the addresses
+        if (user.getAddresses() != null) {
+            user.getAddresses().size();
+        }
+        return user;
+    }
+
+    @Override
     @Transactional
     public List<UserEntity> getAllUsers() {
         return userDao.getAllUsers();
@@ -59,6 +72,8 @@ public class UserServiceImpl implements UserService {
     public UserEntity getUserByEmailAndPassword(String email, String password) {
         return userDao.findUserByEmailAndPassword(email, password);
     }
+
+
 
 
     @Override

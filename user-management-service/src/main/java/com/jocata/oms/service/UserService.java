@@ -18,4 +18,6 @@ public interface UserService {
     void deleteUser(Integer userId , Boolean flag);
 
     UserEntity getUserByEmailAndPassword(String email, String password);
+
+    UserEntity getUserByEmail(String email);
 }

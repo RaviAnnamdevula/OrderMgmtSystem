@@ -16,4 +16,6 @@ public interface UserDao {
     void deleteUser(Integer userId, Boolean flag);
 
     UserEntity findUserByEmailAndPassword(String email, String password);
+
+    UserEntity getUserByEmail(String email);
 }

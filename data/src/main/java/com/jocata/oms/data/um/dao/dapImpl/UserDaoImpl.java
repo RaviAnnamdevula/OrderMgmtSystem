@@ -44,6 +44,16 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     @Transactional
+    public UserEntity getUserByEmail(String email) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM UserEntity WHERE email = :email", UserEntity.class)
+                    .setParameter("email", email)
+                    .uniqueResult();
+        }
+    }
+
+    @Override
+    @Transactional
     public List<UserEntity> getAllUsers() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery("from UserEntity", UserEntity.class).list();
@@ -59,6 +69,8 @@ public class UserDaoImpl implements UserDao {
                     .uniqueResult();
         }
     }
+
+
 
 
     @Override

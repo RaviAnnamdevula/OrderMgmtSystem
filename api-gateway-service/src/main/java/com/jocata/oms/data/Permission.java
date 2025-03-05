@@ -1,4 +1,4 @@
-package com.jocata.oms.entity;
+package com.jocata.oms.data;
 
 import lombok.*;
 
@@ -10,7 +10,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PermissionEntity {
+public class Permission {
 
 
     private Integer permissionId;
@@ -19,5 +19,5 @@ public class PermissionEntity {
     private String permissionName;
 
 
-    private Set<RoleEntity> roles;
+    private Set<Role> roles;
 }

@@ -1,4 +1,4 @@
-package com.jocata.oms.entity;
+package com.jocata.oms.data;
 
 import lombok.*;
 
@@ -10,12 +10,12 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddressEntity {
+public class Address {
 
     private Integer addressId;
 
 
-    private UserEntity user;
+    private User user;
 
 
     private String address;

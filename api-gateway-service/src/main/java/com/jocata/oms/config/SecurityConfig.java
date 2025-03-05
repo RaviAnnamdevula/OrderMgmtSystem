@@ -16,22 +16,16 @@ import reactor.core.publisher.Mono;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
-/*    @Bean
-    public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
-        http.csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
-                .httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(customAuthenticationEntryPoint()));
 
-        return http.build();
-    }*/
 
+    //Authorization
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable) // Disable CSRF for APIs
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/users/admin/**").hasRole("ADMIN") // ✅ Protect all admin endpoints
-                        .pathMatchers("/users/user/**").hasAnyRole("USER", "ADMIN")
+                        .pathMatchers("/users/admin/**").hasAnyAuthority("ADMIN") // ✅ Protect all admin endpoints
+                        .pathMatchers("/users/user/**").hasAnyAuthority("USER", "ADMIN")
                         .pathMatchers(HttpMethod.GET, "/api/public/").permitAll()
                         .anyExchange().authenticated()
                 )
@@ -41,6 +35,8 @@ public class SecurityConfig {
     }
 
 
+
+    //Response message
     @Bean
     public ServerAuthenticationEntryPoint customAuthenticationEntryPoint() {
 
@@ -65,3 +61,11 @@ public class SecurityConfig {
         };
     }
 }
+/*    @Bean
+    public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
+        http.csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
+                .httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(customAuthenticationEntryPoint()));
+
+        return http.build();
+    }*/

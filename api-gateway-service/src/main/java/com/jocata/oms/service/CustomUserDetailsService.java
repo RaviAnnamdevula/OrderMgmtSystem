@@ -2,35 +2,54 @@ package com.jocata.oms.service;
 
 
 import com.jocata.oms.common.response.GenericResponsePayload;
-import com.jocata.oms.entity.UserEntity;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.jocata.oms.data.User;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import reactor.core.publisher.Mono;
 
 @Service
-public class CustomUserDetailsService {
+public class CustomUserDetailsService implements ReactiveUserDetailsService{
+
     private static final String userUrl= "http://localhost:8081/users";
+    private final RestTemplate restTemplate =new RestTemplate();
 
-    private RestTemplate restTemplate =new RestTemplate();
-
-
-    public UserEntity getUserById(Integer userId) {
-        String url = userUrl + "/" + userId;
-        ResponseEntity<GenericResponsePayload<UserEntity>> response = restTemplate.exchange(
+    public User getUserByEmail(String email) {
+        String url = userUrl + "/email/" + email;
+        ResponseEntity<GenericResponsePayload<User>> response = restTemplate.exchange(
                 url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {}
         );
+        System.out.println(response.getBody().getData());
         return response.getBody().getData();
     }
 
-    public UserEntity getUserProfile(String email, String password) {
+    @Override
+    public Mono<UserDetails> findByUsername(String username) {
+        User user = getUserByEmail(username);
+        // user to Mono<User>
+        return Mono.just(user);
+    }
+
+/*    public User getUserProfile(String email, String password) {
         String url = userUrl + "/user/profile?email=" + email + "&password=" + password;
-        ResponseEntity<GenericResponsePayload<UserEntity>> response = restTemplate.exchange(
+        ResponseEntity<GenericResponsePayload<User>> response = restTemplate.exchange(
                 url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {}
         );
         return response.getBody().getData();
+    }*/
+/*
+    public User getUserById(Integer userId) {
+        String url = userUrl + "/id/" + userId;
+        ResponseEntity<GenericResponsePayload<User>> response = restTemplate.exchange(
+                url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {}
+        );
+        System.out.println(response.getBody().getData());
+        return response.getBody().getData();
     }
+*/
 
 
 }

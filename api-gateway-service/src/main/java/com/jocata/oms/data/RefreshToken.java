@@ -1,4 +1,4 @@
-package com.jocata.oms.entity;
+package com.jocata.oms.data;
 
 import lombok.*;
 
@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefreshTokenEntity {
+public class RefreshToken {
 
     private Integer tokenId;
 
-    private UserEntity user;
+    private User user;
 
 
     private LocalDateTime expiresAt;
