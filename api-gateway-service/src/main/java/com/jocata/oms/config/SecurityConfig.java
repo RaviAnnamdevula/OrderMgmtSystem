@@ -28,7 +28,7 @@ public class SecurityConfig {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable) // Disable CSRF for APIs
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/users/admin/**").hasAuthority("ADMIN") // ✅ Protect all admin endpoints
+                        .pathMatchers("/users/admin/**").hasAuthority("ADMIN")
                         .pathMatchers("/users/user/**").hasAuthority("USER")
                         .anyExchange().authenticated()
                 )
