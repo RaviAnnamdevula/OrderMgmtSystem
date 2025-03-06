@@ -1,5 +1,6 @@
 package com.jocata.oms.datamodel.um.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -22,6 +23,7 @@ public class AddressEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private UserEntity user;
 
     @Column(nullable = false ,length = 500)

@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/users/admin/**").hasAuthority("ADMIN")
                         .pathMatchers("/users/user/**").hasAuthority("USER")
+                        .pathMatchers("/data/**").hasAuthority("ADMIN")
                         .anyExchange().authenticated()
                 )
                 .httpBasic(httpBasic -> httpBasic
@@ -62,7 +63,7 @@ public class SecurityConfig {
         };
     }
 }
-/*    @Bean
+/*  @Bean
     public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
         http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())

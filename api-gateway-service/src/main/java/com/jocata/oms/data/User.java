@@ -4,6 +4,9 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 import java.time.LocalDateTime;
@@ -54,17 +57,14 @@ public class User  implements UserDetails {
                 .collect(Collectors.toList());
     }
 
-    /*    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRoleName()))
-                .collect(Collectors.toList());
-    }
-*/
-
+/*    public PasswordEncoder passwordEncoder() {
+         return new BCryptPasswordEncoder();
+       // return NoOpPasswordEncoder.getInstance();
+    }*/
     @Override
     public String getPassword() {
-        return passwordHash;
+       return passwordHash;
+        // return passwordEncoder().encode(passwordHash);
     }
 
     @Override

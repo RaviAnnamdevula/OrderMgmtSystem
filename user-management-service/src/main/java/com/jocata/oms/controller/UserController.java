@@ -5,6 +5,7 @@ import com.jocata.oms.common.response.GenericResponsePayload;
 import com.jocata.oms.common.util.ResponseBuilder;
 import com.jocata.oms.datamodel.um.entity.UserEntity;
 import com.jocata.oms.datamodel.um.form.UserForm;
+import com.jocata.oms.service.DataLoaderService;
 import com.jocata.oms.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,19 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @PostMapping("/create")
+    public ResponseEntity<GenericResponsePayload<UserEntity>> createUser(@RequestBody GenericRequestPayload<UserForm> request) {
+        UserEntity user = userService.createUser(request.getData());
+        return ResponseEntity.ok(ResponseBuilder.buildResponse(user, "User created successfully", HttpStatus.OK));
+    }
+
+    @Autowired
+    private DataLoaderService dataLoaderService;
+    @PostMapping("/admin/load")
+    public ResponseEntity<String> loadData(@RequestParam String filePath) {
+        dataLoaderService.loadData(filePath);
+        return ResponseEntity.ok("Data loaded successfully");
+    }
 
 
     @GetMapping("/email/{email}")
@@ -30,11 +44,7 @@ public class UserController {
         return buildResponse(user, "User fetched successfully");
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<GenericResponsePayload<UserEntity>> createUser(@RequestBody GenericRequestPayload<UserForm> request) {
-        UserEntity user = userService.createUser(request.getData());
-        return ResponseEntity.ok(ResponseBuilder.buildResponse(user, "User created successfully", HttpStatus.OK));
-    }
+
 
     @GetMapping("/id/{userId}")
     public GenericResponsePayload<UserEntity> getUserById(@PathVariable Integer userId) {
