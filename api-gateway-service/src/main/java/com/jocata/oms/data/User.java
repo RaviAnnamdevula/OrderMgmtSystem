@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class User  implements UserDetails {
@@ -52,6 +53,14 @@ public class User  implements UserDetails {
                 .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
                 .collect(Collectors.toList());
     }
+
+    /*    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRoleName()))
+                .collect(Collectors.toList());
+    }
+*/
 
     @Override
     public String getPassword() {

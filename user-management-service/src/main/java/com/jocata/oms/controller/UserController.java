@@ -22,6 +22,14 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+
+
+    @GetMapping("/email/{email}")
+    public GenericResponsePayload<UserEntity> getUserByEmail(@PathVariable String email) {
+        UserEntity user = userService.getUserByEmail(email);
+        return buildResponse(user, "User fetched successfully");
+    }
+
     @PostMapping("/create")
     public ResponseEntity<GenericResponsePayload<UserEntity>> createUser(@RequestBody GenericRequestPayload<UserForm> request) {
         UserEntity user = userService.createUser(request.getData());
@@ -33,13 +41,6 @@ public class UserController {
         UserEntity user = userService.getUserById(userId);
         return buildResponse(user, "User fetched successfully");
     }
-
-    @GetMapping("/email/{email}")
-    public GenericResponsePayload<UserEntity> getUserByEmail(@PathVariable String email) {
-        UserEntity user = userService.getUserByEmail(email);
-        return buildResponse(user, "User fetched successfully");
-    }
-
     @GetMapping("/user/profile")
     public ResponseEntity<GenericResponsePayload<UserEntity>> getUserProfile(
             @RequestParam String email,

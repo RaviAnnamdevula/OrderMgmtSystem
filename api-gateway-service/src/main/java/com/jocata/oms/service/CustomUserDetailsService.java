@@ -23,6 +23,7 @@ public class CustomUserDetailsService implements ReactiveUserDetailsService{
                 url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {}
         );
         System.out.println(response.getBody().getData());
+        System.out.println(response.getBody().getData().getRoles());
         return response.getBody().getData();
     }
 

@@ -1,12 +1,15 @@
 package com.jocata.oms.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
 import org.springframework.web.server.ServerWebExchange;
@@ -16,7 +19,8 @@ import reactor.core.publisher.Mono;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
-
+    @Autowired
+    private ReactiveAuthenticationManager reactiveAuthenticationManager;
 
     //Authorization
     @Bean
@@ -24,17 +28,14 @@ public class SecurityConfig {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable) // Disable CSRF for APIs
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/users/admin/**").hasAnyAuthority("ADMIN") // ✅ Protect all admin endpoints
-                        .pathMatchers("/users/user/**").hasAnyAuthority("USER", "ADMIN")
-                        .pathMatchers(HttpMethod.GET, "/api/public/").permitAll()
+                        .pathMatchers("/users/admin/**").hasAuthority("ADMIN") // ✅ Protect all admin endpoints
+                        .pathMatchers("/users/user/**").hasAuthority("USER")
                         .anyExchange().authenticated()
                 )
                 .httpBasic(httpBasic -> httpBasic
                         .authenticationEntryPoint(customAuthenticationEntryPoint()));
         return http.build();
     }
-
-
 
     //Response message
     @Bean
