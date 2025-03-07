@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,9 +58,10 @@ public class DataLoaderServiceImpl implements DataLoaderService {
         try (FileInputStream fis = new FileInputStream(filePath);
              Workbook workbook = new XSSFWorkbook(fis)) {
 
-            Sheet sheet = workbook.getSheetAt(0); // Get the first sheet
+            Sheet sheet = workbook.getSheetAt(0);
             for (Row row : sheet) {
-                if (row.getRowNum() == 0) continue; // Skip header
+                if (row.getRowNum() == 0) continue;
+
 
 
                 // Create UserEntity
@@ -95,7 +97,8 @@ public class DataLoaderServiceImpl implements DataLoaderService {
                 role.setRoleName(row.getCell(13).getStringCellValue());
                 Set<RoleEntity> roles = new HashSet<>();
                 roles.add(role);
-                user.setRoles(roles);
+                // role.setUsers(new HashSet<>((Collection) user));
+
 
                 // Create PermissionEntity
                 PermissionEntity permission = new PermissionEntity();
@@ -103,7 +106,7 @@ public class DataLoaderServiceImpl implements DataLoaderService {
                 permissionDao.savePermission(permission);
                 role.setPermissions(new HashSet<>(Set.of(permission)));
                // role.getPermissions().add(permission);
-
+                user.setRoles(roles);
                 // Create RefreshTokenEntity
                 RefreshTokenEntity refreshToken = new RefreshTokenEntity();
                 refreshToken.setUser(user);

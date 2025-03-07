@@ -30,7 +30,6 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/users/admin/**").hasAuthority("ADMIN")
                         .pathMatchers("/users/user/**").hasAuthority("USER")
-                        .pathMatchers("/data/**").hasAuthority("ADMIN")
                         .anyExchange().authenticated()
                 )
                 .httpBasic(httpBasic -> httpBasic
