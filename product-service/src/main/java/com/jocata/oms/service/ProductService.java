@@ -1,10 +1,12 @@
 package com.jocata.oms.service;
 
+import com.jocata.oms.datamodel.um.entity.InventoryEntity;
 import com.jocata.oms.datamodel.um.entity.ProductEntity;
 import com.jocata.oms.datamodel.um.form.ProductRequest;
 import com.jocata.oms.repo.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,6 +18,8 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
+    private RestTemplate restTemplate = new RestTemplate();
+
     public List<ProductEntity> getAllProducts() {
         return productRepository.findAll();
     }
@@ -26,6 +30,7 @@ public class ProductService {
                 .description(productRequest.getDescription())
                 .price(BigDecimal.valueOf(Long.parseLong(productRequest.getPrice())))
                 .build();
+
         return productRepository.save(product);
     }
 
@@ -43,5 +48,9 @@ public class ProductService {
 
     public void deleteProduct(Integer id) {
         productRepository.deleteById(id);
+    }
+
+    public ProductEntity getByProductId(Integer id) {
+        return productRepository.findByProductId(id);
     }
 }

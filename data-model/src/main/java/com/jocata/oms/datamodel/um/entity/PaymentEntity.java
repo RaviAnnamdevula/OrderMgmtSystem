@@ -2,8 +2,12 @@ package com.jocata.oms.datamodel.um.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.CurrentTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,7 +28,8 @@ public class PaymentEntity {
     private Integer orderId;
 
     @Column(name = "payment_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime paymentDate;
+    @CreationTimestamp
+    private Timestamp paymentDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method")
@@ -41,16 +46,13 @@ public class PaymentEntity {
     private BigDecimal amount;
 
     @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime createdAt;
+    @CurrentTimestamp
+    private Timestamp createdAt;
 
     @Column(name = "updated_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    private LocalDateTime updatedAt;
+    @UpdateTimestamp
+    private Timestamp updatedAt;
 
-    public enum PaymentMethod {
-        CREDIT_CARD, DEBIT_CARD, PAYPAL, CASH, UPI
-    }
 
-    public enum PaymentStatus {
-        PENDING, COMPLETED, FAILED, REFUNDED
-    }
+
 }

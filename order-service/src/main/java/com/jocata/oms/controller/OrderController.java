@@ -22,13 +22,13 @@ public class OrderController {
         return ResponseEntity.ok(orderService.placeOrder(orderRequest));
     }
 
-    @PutMapping("/{orderId}/confirm")
-    public ResponseEntity<OrderEntity> confirmOrder(@PathVariable Integer orderId) {
-        return ResponseEntity.ok(orderService.confirmOrder(orderId));
+    @PutMapping("/confirm")
+    public ResponseEntity<OrderEntity> confirmOrder(@RequestParam Integer orderId ,@RequestParam String orderStatus ) {
+        return ResponseEntity.ok(orderService.confirmOrder(orderId , orderStatus));
     }
 
     @GetMapping("/{orderId}")
-    public ResponseEntity<OrderEntity> getOrderById(@PathVariable Integer orderId) {
+    public ResponseEntity<OrderEntity> getOrderById(@RequestParam Integer orderId) {
         return ResponseEntity.ok(orderService.getOrderById(orderId));
     }
 

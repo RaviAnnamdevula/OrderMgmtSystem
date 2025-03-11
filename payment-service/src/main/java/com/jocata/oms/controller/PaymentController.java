@@ -2,9 +2,11 @@ package com.jocata.oms.controller;
 
 
 import com.jocata.oms.datamodel.um.entity.PaymentEntity;
+import com.jocata.oms.datamodel.um.form.PaymentRequest;
 import com.jocata.oms.service.PaymentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -19,7 +21,7 @@ public class PaymentController {
     }
 
     @PostMapping
-    public ResponseEntity<PaymentEntity> processPayment(@RequestBody PaymentEntity payment) {
+    public ResponseEntity<PaymentEntity> processPayment(@RequestBody PaymentRequest payment) {
         return ResponseEntity.ok(paymentService.processPayment(payment));
     }
 
@@ -29,7 +31,7 @@ public class PaymentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PaymentEntity> updatePaymentStatus(@PathVariable Integer id, @RequestBody PaymentEntity payment) {
+    public ResponseEntity<PaymentEntity> updatePaymentStatus(@PathVariable Integer id, @RequestBody PaymentRequest payment) {
         return ResponseEntity.ok(paymentService.updatePaymentStatus(id, payment));
     }
 }

@@ -16,7 +16,7 @@ import java.util.List;
 
 // Controller
 @RestController
-@RequestMapping("/inventory")
+@RequestMapping("/warehouse")
 public class InventoryController {
 
     @Autowired
@@ -40,6 +40,10 @@ public class InventoryController {
     @PutMapping("/update")
     public ResponseEntity<InventoryEntity> updateStock(@RequestParam Integer productId, @RequestParam Integer quantity) {
         return ResponseEntity.ok(inventoryService.updateStock(productId, quantity));
+    }
+    @PutMapping("/updateStock")
+    public ResponseEntity<InventoryEntity> updateStock(@RequestParam Integer productId) {
+        return ResponseEntity.ok(inventoryService.updateStock(productId));
     }
 }
 

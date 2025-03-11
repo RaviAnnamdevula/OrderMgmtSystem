@@ -2,6 +2,8 @@ package com.jocata.oms.datamodel.um.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CurrentTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -30,6 +32,7 @@ public class InventoryEntity {
     private Integer reservedStock = 0;
 
     @Column(name = "last_updated", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @UpdateTimestamp
     private Timestamp lastUpdated;
 
 }

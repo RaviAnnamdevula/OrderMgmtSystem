@@ -19,8 +19,11 @@ public class InventoryService {
     }
 
     public InventoryEntity reserveStock(Integer productId, Integer quantity) {
-        InventoryEntity inventory = inventoryRepository.findByProductId(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found in inventory"));
+        InventoryEntity inventory = inventoryRepository.findByProductId(productId);
+        if(inventory == null){
+            throw new RuntimeException("Product not found in inventory");
+        }
+               // .orElseThrow(() -> new RuntimeException("Product not found in inventory"));
         if (inventory.getStockQuantity() >= quantity) {
             inventory.setStockQuantity(inventory.getStockQuantity() - quantity);
             inventory.setReservedStock(inventory.getReservedStock() + quantity);
@@ -31,8 +34,11 @@ public class InventoryService {
     }
 
     public InventoryEntity releaseStock(Integer productId, Integer quantity) {
-        InventoryEntity inventory = inventoryRepository.findByProductId(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found in inventory"));
+        InventoryEntity inventory = inventoryRepository.findByProductId(productId);
+        if(inventory == null){
+            throw new RuntimeException("Product not found in inventory");
+        }
+             //   .orElseThrow(() -> new RuntimeException("Product not found in inventory"));
         if (inventory.getReservedStock() >= quantity) {
             inventory.setReservedStock(inventory.getReservedStock() - quantity);
             inventory.setStockQuantity(inventory.getStockQuantity() + quantity);
@@ -43,9 +49,28 @@ public class InventoryService {
     }
 
     public InventoryEntity updateStock(Integer productId, Integer quantity) {
-        InventoryEntity inventory = inventoryRepository.findByProductId(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found in inventory"));
+        InventoryEntity inventory = inventoryRepository.findByProductId(productId);
+
+        if(inventory == null){
+            InventoryEntity inventory1 = new InventoryEntity();
+            inventory1.setStockQuantity(quantity);
+            inventory1.setProductId(productId);
+            return inventoryRepository.save(inventory1);
+        }
+               // .orElseThrow(() -> new RuntimeException("Product not found in inventory"));
         inventory.setStockQuantity(quantity);
+        inventory.setReservedStock(0);
         return inventoryRepository.save(inventory);
+    }
+
+    public InventoryEntity updateStock(Integer productId) {
+        InventoryEntity inventory = inventoryRepository.findByProductId(productId);
+        if(inventory == null){
+            throw new RuntimeException("Product not found in inventory");
+        }
+        //   .orElseThrow(() -> new RuntimeException("Product not found in inventory"));
+            inventory.setReservedStock(0);
+
+            return inventoryRepository.save(inventory);
     }
 }
