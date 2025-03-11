@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/users/admin/**").hasAuthority("ADMIN")
                         .pathMatchers("/users/user/**").hasAuthority("USER")
+                        .pathMatchers("/order/**","/payment/**","/product/**","/inventory/**").permitAll()
                         .anyExchange().authenticated()
                 )
                 .httpBasic(httpBasic -> httpBasic
