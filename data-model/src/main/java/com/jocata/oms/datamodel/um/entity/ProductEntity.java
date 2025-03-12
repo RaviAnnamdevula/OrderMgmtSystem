@@ -30,7 +30,7 @@ public class ProductEntity {
     private String description;
 
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
+    private Integer price;
 
     @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", nullable = false)
     @CreationTimestamp

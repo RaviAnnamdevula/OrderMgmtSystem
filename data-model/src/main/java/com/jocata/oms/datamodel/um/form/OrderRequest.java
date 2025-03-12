@@ -12,7 +12,7 @@ import java.util.List;
 @ToString
 public class OrderRequest {
     private Integer customerId;
-    private Integer productId;
-    private Integer quantity;
-    //private List<OrderItemRequest> orderItemRequests;
+//    private Integer productId;
+//    private Integer quantity;
+    private List<OrderItemRequest> orderItemRequests;
 }

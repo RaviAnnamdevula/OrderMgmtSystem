@@ -4,6 +4,7 @@ import com.jocata.oms.datamodel.um.entity.OrderEntity;
 import com.jocata.oms.datamodel.um.entity.OrderItemEntity;
 import com.jocata.oms.datamodel.um.entity.OrderStatus;
 import com.jocata.oms.datamodel.um.entity.ProductEntity;
+import com.jocata.oms.datamodel.um.form.OrderItemRequest;
 import com.jocata.oms.datamodel.um.form.OrderRequest;
 import com.jocata.oms.repo.OrderItemRepository;
 import com.jocata.oms.repo.OrderRepository;
@@ -15,7 +16,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+
+import static org.bouncycastle.asn1.x500.style.RFC4519Style.o;
 
 @Service
 public class OrderService {
@@ -43,15 +47,21 @@ public class OrderService {
         //3) update the reserve stock -quantity +reserveStock
         //  changes --> Make to list of ordersItems and change saving in orders and S
         // So, get all inventory and check the stock and at last reserve stock
-        ProductEntity product = fetchProduct(orderRequest.getProductId());
-
-        OrderEntity order = createOrder(orderRequest, product);
+        Integer totalPrice = 0;
+        List<ProductEntity> product =  new ArrayList<>();
+        List<OrderItemRequest> orderItemRequests = orderRequest.getOrderItemRequests();
+        for(OrderItemRequest o : orderItemRequests){
+            ProductEntity productEntity = fetchProduct(o.getProductId());
+            totalPrice += (productEntity.getPrice()*(o.getQuantity()));
+            product.add(productEntity);
+            reserveStock(o.getProductId(), o.getQuantity());
+        }
+        OrderEntity order = createOrder(orderRequest, totalPrice);
         orderRepository.save(order);
-        createOrderItem(order, orderRequest, product);
-
-        reserveStock(orderRequest.getProductId(), orderRequest.getQuantity());
-
-        return order;
+        for(int i = 0 ; i< product.size() ; i++){
+            createOrderItem(order, orderRequest, product.get(i) , orderItemRequests.get(i));
+        }
+        return null;
     }
 
     private ProductEntity fetchProduct(Integer productId) {
@@ -72,20 +82,20 @@ public class OrderService {
                 .block();
     }
 
-    private OrderEntity createOrder(OrderRequest orderRequest, ProductEntity product) {
+    private OrderEntity createOrder(OrderRequest orderRequest,  Integer totalPrice) {
         OrderEntity order = new OrderEntity();
         order.setCustomerId(orderRequest.getCustomerId());
         order.setOrderStatus(OrderStatus.PENDING);
-        order.setTotalAmount(product.getPrice().multiply(BigDecimal.valueOf(orderRequest.getQuantity())));
+        order.setTotalAmount(BigDecimal.valueOf(totalPrice));
         return order;
     }
 
-    private void createOrderItem(OrderEntity order, OrderRequest orderRequest, ProductEntity product) {
+    private void createOrderItem(OrderEntity order, OrderRequest orderRequest, ProductEntity product, OrderItemRequest orderItemRequest) {
         OrderItemEntity orderItem = new OrderItemEntity();
         orderItem.setOrder(order);
-        orderItem.setProductId(orderRequest.getProductId());
-        orderItem.setQuantity(orderRequest.getQuantity());
-        orderItem.setPrice(product.getPrice());
+        orderItem.setProductId(orderItemRequest.getProductId());
+        orderItem.setQuantity(orderItemRequest.getQuantity());
+        orderItem.setPrice(BigDecimal.valueOf(product.getPrice()));
         orderItemRepository.save(orderItem);
     }
 
@@ -98,7 +108,6 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
         OrderItemEntity orderItem = orderItemRepository.findByOrderId(orderId);
-
 
         if ("CANCELLED".equals(orderStatus)) {
             order.setOrderStatus(OrderStatus.CANCELLED);
