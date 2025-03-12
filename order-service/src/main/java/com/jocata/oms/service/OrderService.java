@@ -87,7 +87,7 @@ public class OrderService {
         // Get the order entity  and orderItem entity(for product Id)
         // for now no validation| if cancelled update orderStatus and add stock to quantity from reserve
         // if CONFIRMED update or set reserve stock to 0
-        // Potential problems ->
+        // Potential problems -> 3
         OrderEntity order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
@@ -96,12 +96,13 @@ public class OrderService {
 
         if ("CANCELLED".equals(orderStatus)) {
             order.setOrderStatus(OrderStatus.CANCELLED);
-
+            releaseStock(orderItem.getProductId(), orderItem.getQuantity());
         } else if ("CONFIRMED".equals(orderStatus)) {
             order.setOrderStatus(OrderStatus.CONFIRMED);
             order.setIsPaid(true);
+            updateStock(orderItem.getProductId() , orderItem.getQuantity() );
         }
-        releaseStock(orderItem.getProductId(), orderItem.getQuantity());
+
 
 
         return orderRepository.save(order);
@@ -116,10 +117,10 @@ public class OrderService {
                 .block();
     }
 
-    private void updateStock(Integer productId) {
+    private void updateStock(Integer productId, int quantity) {
         webClientBuilder.build()
                 .put()
-                .uri(inventoryServiceUrl + "/updateStock?productId=" + productId)
+                .uri(inventoryServiceUrl + "/updateStock?productId=" + productId + "&quantity=" + quantity)
                 .retrieve()
                 .toBodilessEntity()
                 .block();
