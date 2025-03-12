@@ -84,7 +84,10 @@ public class OrderService {
     }
 
     public OrderEntity confirmOrder(Integer orderId, String orderStatus) {
-        // Get the order entity ->
+        // Get the order entity  and orderItem entity(for product Id)
+        // for now no validation| if cancelled update orderStatus and add stock to quantity from reserve
+        // if CONFIRMED update or set reserve stock to 0
+        // Potential problems ->
         OrderEntity order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
@@ -93,13 +96,12 @@ public class OrderService {
 
         if ("CANCELLED".equals(orderStatus)) {
             order.setOrderStatus(OrderStatus.CANCELLED);
-            releaseStock(orderItem.getProductId(), orderItem.getQuantity());
+
         } else if ("CONFIRMED".equals(orderStatus)) {
             order.setOrderStatus(OrderStatus.CONFIRMED);
             order.setIsPaid(true);
-            updateStock(orderItem.getProductId());
         }
-
+        releaseStock(orderItem.getProductId(), orderItem.getQuantity());
 
 
         return orderRepository.save(order);

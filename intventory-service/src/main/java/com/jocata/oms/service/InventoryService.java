@@ -63,7 +63,7 @@ public class InventoryService {
         return inventoryRepository.save(inventory);
     }
 
-    public InventoryEntity updateStock(Integer productId) {
+/*    public InventoryEntity updateStock(Integer productId) {
         InventoryEntity inventory = inventoryRepository.findByProductId(productId);
         if(inventory == null){
             throw new RuntimeException("Product not found in inventory");
@@ -72,5 +72,5 @@ public class InventoryService {
             inventory.setReservedStock(0);
 
             return inventoryRepository.save(inventory);
-    }
+    }*/
 }
