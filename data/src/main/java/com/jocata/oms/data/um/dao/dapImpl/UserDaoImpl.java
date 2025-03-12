@@ -34,13 +34,26 @@ public class UserDaoImpl implements UserDao {
     }
 
 
-    @Override
+   /* @Override
     @Transactional
     public UserEntity getUserById(Integer userId) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.get(UserEntity.class, userId);
         }
-    }
+    }*/
+   @Override
+   @Transactional
+   public UserEntity getUserById(Integer userId) {
+       try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+           UserEntity userEntity = session.createQuery(
+                           "SELECT u FROM UserEntity u LEFT JOIN FETCH u.addresses WHERE u.userId = :userId", UserEntity.class)
+                   .setParameter("userId", userId)
+                   .uniqueResult();
+       return userEntity;
+       }
+
+   }
+
 
     @Override
     @Transactional

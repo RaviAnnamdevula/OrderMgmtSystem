@@ -1,23 +1,28 @@
 package com.jocata.oms.service;
 
-import com.jocata.oms.datamodel.um.entity.OrderEntity;
-import com.jocata.oms.datamodel.um.entity.OrderItemEntity;
-import com.jocata.oms.datamodel.um.entity.OrderStatus;
-import com.jocata.oms.datamodel.um.entity.ProductEntity;
+import com.jocata.oms.datamodel.um.entity.*;
 import com.jocata.oms.datamodel.um.form.OrderItemRequest;
 import com.jocata.oms.datamodel.um.form.OrderRequest;
+import com.jocata.oms.datamodel.um.form.OrderResponseForm;
 import com.jocata.oms.repo.OrderItemRepository;
 import com.jocata.oms.repo.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
+
+
 
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.bouncycastle.asn1.x500.style.RFC4519Style.o;
 
@@ -33,11 +38,26 @@ public class OrderService {
     @Autowired
     private WebClient.Builder webClientBuilder;
 
+    @Autowired
+    private RestTemplate restTemplate;
+
+    private final String userServiceUrl = "http://localhost:8081/users/user/id";
+
     @Value("${product-service-url}")
     private String productServiceUrl;
 
     @Value("${inventory-service-url}")
     private String inventoryServiceUrl;
+
+    private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
+
+    public OrderService(CircuitBreakerFactory<?, ?> circuitBreakerFactory) {
+        this.circuitBreakerFactory = circuitBreakerFactory;
+    }
+
+    private static final String SERVICE_NAME1 = "product-service";
+    private static final String SERVICE_NAME2 = "user-service";
+
 
     @Transactional(rollbackFor = Exception.class)
     public OrderEntity placeOrder(OrderRequest orderRequest) {
@@ -64,14 +84,9 @@ public class OrderService {
         return null;
     }
 
-    private ProductEntity fetchProduct(Integer productId) {
-        return webClientBuilder.build()
-                .get()
-                .uri(productServiceUrl + "/getByProductId?id=" + productId)
-                .retrieve()
-                .bodyToMono(ProductEntity.class)
-                .block();
-    }
+
+  //  @io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker(name = "userService", fallbackMethod = "fallbackUser")
+
 
     private void reserveStock(Integer productId, int quantity) {
         webClientBuilder.build()
@@ -107,7 +122,9 @@ public class OrderService {
         OrderEntity order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        OrderItemEntity orderItem = orderItemRepository.findByOrderId(orderId);
+        List<OrderItemEntity> orderItemList = orderItemRepository.findByOrderId(orderId);
+
+        OrderItemEntity orderItem = orderItemList.get(0);
 
         if ("CANCELLED".equals(orderStatus)) {
             order.setOrderStatus(OrderStatus.CANCELLED);
@@ -117,8 +134,6 @@ public class OrderService {
             order.setIsPaid(true);
             updateStock(orderItem.getProductId() , orderItem.getQuantity() );
         }
-
-
 
         return orderRepository.save(order);
     }
@@ -141,15 +156,119 @@ public class OrderService {
                 .block();
     }
 
-    public OrderEntity getOrderById(Integer orderId) {
-        return orderRepository.findById(orderId)
+   /*
+    public OrderResponseForm getOrderById(Integer orderId) {
+
+        OrderEntity order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        OrderResponseForm orderResponseForm = new OrderResponseForm();
+        orderResponseForm.setOrderDetails(order);
+
+        List<OrderItemEntity> orderItemEntities = orderItemRepository.findByOrderId(orderId);
+        orderResponseForm.setOrderItems(orderItemEntities);
+
+        List<ProductEntity> productEntities = orderItemEntities.stream()
+                .map(item -> fetchProduct(item.getProductId()))
+                .collect(Collectors.toList());
+        orderResponseForm.setProducts(productEntities);
+
+        UserEntity user = fetchUser(order.getCustomerId());
+        orderResponseForm.setUserDetails(user);
+
+        return orderResponseForm;
+    }
+
+    @io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker(name = SERVICE_NAME2, fallbackMethod = "fallbackUser")
+    public UserEntity fetchUser(Integer userId) {
+        String url = UriComponentsBuilder.fromHttpUrl(userServiceUrl)
+                .queryParam("userId", userId)
+                .toUriString();
+        return restTemplate.getForObject(url, UserEntity.class);
+    }
+
+    @io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker(name = SERVICE_NAME1, fallbackMethod = "fallbackProduct")
+    public ProductEntity fetchProduct(Integer productId) {
+        return webClientBuilder.build()
+                .get()
+                .uri(productServiceUrl + "/getByProductId?id=" + productId)
+                .retrieve()
+                .bodyToMono(ProductEntity.class)
+                .block();
+    }
+
+    public UserEntity fallbackUser(Integer userId, Throwable throwable) {
+        UserEntity fallbackUser = new UserEntity();
+        fallbackUser.setUserId(-1);
+        fallbackUser.setFullName("Fallback User");
+        fallbackUser.setEmail("N/A");
+        return fallbackUser;
+    }
+
+    public ProductEntity fallbackProduct(Integer productId, Throwable throwable) {
+        ProductEntity fallbackProduct = new ProductEntity();
+        fallbackProduct.setProductId(-1);
+        fallbackProduct.setName("Product unavailable");
+        fallbackProduct.setDescription("Failed to fetch product with ID: " + productId);
+        return fallbackProduct;
     }
 
     public List<OrderEntity> getAllOrders() {
         return orderRepository.findAll();
+    }*/
+  //  @io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker(name = "userService", fallbackMethod = "fallbackUserDetails")
+    public OrderResponseForm getOrderById(Integer orderId) {
+
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("userService");
+
+        OrderEntity order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        OrderResponseForm orderResponseForm =  new OrderResponseForm();
+        orderResponseForm.setOrderDetails(order);
+        List<OrderItemEntity> orderItemEntities = orderItemRepository.findByOrderId(orderId);
+        orderResponseForm.setOrderItems(orderItemEntities);
+        List<ProductEntity> productEntities = new ArrayList<>();
+        for (OrderItemEntity o : orderItemEntities){
+            productEntities.add(fetchProduct(o.getProductId()));
+        }
+        orderResponseForm.setProducts(productEntities);
+       // orderResponseForm.setAddressEntity();
+        String url = UriComponentsBuilder.fromHttpUrl(userServiceUrl)
+                .queryParam("userId", order.getCustomerId())
+                .toUriString();
+
+//        UserEntity user = restTemplate.getForObject(url, UserEntity.class);
+//        orderResponseForm.setUserDetails(user);
+        UserEntity user = circuitBreaker.run(() -> restTemplate.getForObject(url, UserEntity.class),
+                throwable -> fallbackUser());
+        orderResponseForm.setUserDetails(user);
+        return orderResponseForm;
     }
+    private ProductEntity fetchProduct(Integer productId) {
+        return webClientBuilder.build()
+                .get()
+                .uri(productServiceUrl + "/getByProductId?id=" + productId)
+                .retrieve()
+                .bodyToMono(ProductEntity.class)
+                .block();
+    }
+    private UserEntity fallbackUser() {
+        UserEntity fallbackUser = new UserEntity();
+        fallbackUser.setUserId(-1);
+        fallbackUser.setFullName("User service is not responding properly");
+        fallbackUser.setEmail("N/A");
+        fallbackUser.setSmsEnabled(null);
+        fallbackUser.setIsActive(null);
+        return fallbackUser;
+    }
+
+
+    public List<OrderEntity> getAllOrders() {
+        return orderRepository.findAll();
+    }
+
 }
+
 /*
 package com.jocata.oms.service;
 

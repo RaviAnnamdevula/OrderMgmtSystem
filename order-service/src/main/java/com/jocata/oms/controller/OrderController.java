@@ -2,6 +2,7 @@ package com.jocata.oms.controller;
 
 import com.jocata.oms.datamodel.um.entity.OrderEntity;
 import com.jocata.oms.datamodel.um.form.OrderRequest;
+import com.jocata.oms.datamodel.um.form.OrderResponseForm;
 import com.jocata.oms.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +28,8 @@ public class OrderController {
         return ResponseEntity.ok(orderService.confirmOrder(orderId , orderStatus));
     }
 
-    @GetMapping("/{orderId}")
-    public ResponseEntity<OrderEntity> getOrderById(@RequestParam Integer orderId) {
+    @GetMapping("/single")
+    public ResponseEntity<OrderResponseForm> getOrderById(@RequestParam Integer orderId) {
         return ResponseEntity.ok(orderService.getOrderById(orderId));
     }
 

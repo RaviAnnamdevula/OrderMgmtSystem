@@ -42,10 +42,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new UserNotFoundException("User with ID " + userId + " not found");
         }
-        // Explicitly fetch the addresses
-        if (user.getAddresses() != null) {
-            user.getAddresses().size();
-        }
+
         return user;
     }
 

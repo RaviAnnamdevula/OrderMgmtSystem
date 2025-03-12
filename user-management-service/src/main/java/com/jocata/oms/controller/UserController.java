@@ -7,6 +7,7 @@ import com.jocata.oms.datamodel.um.entity.UserEntity;
 import com.jocata.oms.datamodel.um.form.UserForm;
 import com.jocata.oms.service.DataLoaderService;
 import com.jocata.oms.service.UserService;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
@@ -46,10 +47,10 @@ public class UserController {
 
 
 
-    @GetMapping("/id/{userId}")
-    public GenericResponsePayload<UserEntity> getUserById(@PathVariable Integer userId) {
+    @GetMapping("/id")
+    public UserEntity getUserById(@RequestParam Integer userId) {
         UserEntity user = userService.getUserById(userId);
-        return buildResponse(user, "User fetched successfully");
+         return user;
     }
     @GetMapping("/user/profile")
     public ResponseEntity<GenericResponsePayload<UserEntity>> getUserProfile(
