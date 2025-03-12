@@ -38,13 +38,19 @@ public class OrderService {
     @Transactional(rollbackFor = Exception.class)
     public OrderEntity placeOrder(OrderRequest orderRequest) {
         //1) fetch the product details first
+        // 1.1 -> fetch inventory and the product and check stock available (CHANGE to  be make)
         //2) Save item in to order entity with status PENDING, and add into the orderItem list
         //3) update the reserve stock -quantity +reserveStock
+        //  changes --> Make to list of ordersItems and change saving in orders and S
+        // So, get all inventory and check the stock and at last reserve stock
         ProductEntity product = fetchProduct(orderRequest.getProductId());
+
         OrderEntity order = createOrder(orderRequest, product);
         orderRepository.save(order);
         createOrderItem(order, orderRequest, product);
+
         reserveStock(orderRequest.getProductId(), orderRequest.getQuantity());
+
         return order;
     }
 

@@ -16,5 +16,4 @@ public class OrderItemRequest {
 
     private Integer quantity;
 
-    private BigDecimal price;
 }

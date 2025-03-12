@@ -16,4 +16,6 @@ public class ProductRequest {
     private String description;
 
     private String price;
+
+    private Integer quantity;
 }

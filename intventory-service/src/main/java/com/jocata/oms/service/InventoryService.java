@@ -69,7 +69,8 @@ public class InventoryService {
             throw new RuntimeException("Product not found in inventory");
         }
         //   .orElseThrow(() -> new RuntimeException("Product not found in inventory"));
-            inventory.setReservedStock(inventory.getReservedStock() - quantity);
+            inventory.setReservedStock(inventory.getReservedStock() - quantity
+            );
 
             return inventoryRepository.save(inventory);
     }

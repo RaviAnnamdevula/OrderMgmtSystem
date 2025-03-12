@@ -37,9 +37,6 @@ public class OrderItemEntity {
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
-    /*@Column(name = "subtotal", precision = 10, scale = 2)
-    private BigDecimal subtotal;*/
-
     @Column(name = "subtotal", insertable = false, updatable = false)
     private BigDecimal subtotal;
 

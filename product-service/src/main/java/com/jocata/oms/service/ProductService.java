@@ -31,7 +31,13 @@ public class ProductService {
                 .price(BigDecimal.valueOf(Long.parseLong(productRequest.getPrice())))
                 .build();
 
-        return productRepository.save(product);
+        ProductEntity productEntity = productRepository.save(product);
+        String str = "http://localhost:8082/inventory/warehouse/update?productId="+productEntity.getProductId()+"&quantity="+productRequest.getQuantity();
+
+        restTemplate.put(str,null);
+
+
+        return productEntity;
     }
 
     public ProductEntity updateProduct(Integer id, ProductRequest productRequest) {
