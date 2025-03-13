@@ -245,12 +245,20 @@ public class OrderService {
         return orderResponseForm;
     }
     private ProductEntity fetchProduct(Integer productId) {
-        return webClientBuilder.build()
-                .get()
-                .uri(productServiceUrl + "/getByProductId?id=" + productId)
-                .retrieve()
-                .bodyToMono(ProductEntity.class)
-                .block();
+        CircuitBreaker circuitBreaker1 = circuitBreakerFactory.create("productService");
+        return circuitBreaker1.run( () ->
+            webClientBuilder.build()
+                    .get()
+                    .uri(productServiceUrl + "/getByProductId?id=" + productId)
+                    .retrieve()
+                    .bodyToMono(ProductEntity.class)
+                    .block(), throwable -> fallbackProduct()  ) ;
+    }
+
+    private ProductEntity fallbackProduct(){
+        ProductEntity fallBack = new ProductEntity();
+        fallBack.setName("Product Service is not available");
+        return fallBack;
     }
     private UserEntity fallbackUser() {
         UserEntity fallbackUser = new UserEntity();
